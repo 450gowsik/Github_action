@@ -1,4 +1,4 @@
-name: Python CI
+name: Python CI/CD to EC2
 
 on:
   push:
@@ -6,13 +6,17 @@ on:
       - main
 
 jobs:
-  build:
+
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -21,5 +25,38 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
 
-      - name: Run tests
-        run: pytest
+      - name: Run Tests
+        run: |
+          pytest
+
+  deploy:
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            cd ~/Github_action
+
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+
+            source venv/bin/activate
+
+            git pull origin main
+
+            pip install -r requirements.txt
+
+            pytest
+
+            echo "Deployment successful"
