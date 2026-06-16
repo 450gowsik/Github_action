@@ -12,4 +12,4 @@ def test_lowercase():
     assert tool.lowercase("HELLO") == "hello"
 
 def test_words():
-    assert tool.count_words("hello world") == 
+    assert tool.count_words("hello world") == 2
