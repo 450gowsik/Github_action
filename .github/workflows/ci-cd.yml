@@ -54,7 +54,7 @@ jobs:
           secure: true
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: GitHub Actions Deployment Success
+          subject: Deployment Success
           to: yourmail@gmail.com
           from: GitHub Actions
           body: |
